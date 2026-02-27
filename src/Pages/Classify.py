@@ -7,7 +7,7 @@ st.set_page_config(page_title="Predict")
 
 original_df = pd.read_csv(r'C:\Users\mabin\Desktop\DataScienceClassNotes\Career247_Capstone_Project\Fraud_Detection_Project\data\raw\transactions_fraud.csv')
 
-df = pickle.load(open(r'C:\Users\mabin\Desktop\DataScienceClassNotes\Career247_Capstone_Project\Fraud_Detection_Project\models\df.pkl', 'rb'))
+df = pickle.load(open('models\df.pkl', 'rb'))
 
 pipeline = pickle.load(open(r'C:\Users\mabin\Desktop\DataScienceClassNotes\Career247_Capstone_Project\Fraud_Detection_Project\models\pipeline.pkl', 'rb'))
 
@@ -17,13 +17,10 @@ st.header("Enter Your Inputs")
 
 # # -----------------------------------------------------------------------------------------------------------------------------
 
+df['transaction_date'] = pd.to_datetime(df['transaction_date'])
+
 # Customer ID
-customer_id = st.number_input(
-    "Customer ID",
-    min_value=int(original_df['customer_id'].min()),
-    max_value=int(original_df['customer_id'].max()),
-    step=1
-)
+customer_id = st.number_input("Customer ID")
 
 customer_id = int(customer_id)
 
@@ -52,30 +49,6 @@ ip_address_risk_score = st.slider("IP Risk Score", 0.0, 1.0)
 device_trust_score = st.slider("Device Trust Score", 0.0, 1.0)
 
 
-
-
-# Device Count
-device_count = original_df.loc[original_df['customer_id'] == customer_id, 'device_id'].nunique()
-
-# Customer Average Amount
-cust_avg_amt = original_df.loc[original_df['customer_id'] == customer_id, 'amount'].mean()
-
-
-
-# Customer Fraud rate
-cust_fraud_rate = df.loc[original_df['customer_id'] == customer_id, 'is_fraud'].mean()
-
-
-# Customer Fraud Count
-cust_fraud_count = original_df.loc[original_df['customer_id'] == customer_id, 'is_fraud'].sum()
-
-
-# Customer Transaction Count
-cust_txn_count = original_df.loc[original_df['customer_id'] == customer_id, 'transaction_id'].count()
-
-
-
-
 # Device Change Flag
 device_change = st.radio("Is this a new device?", ["No", "Yes"])
 if device_change == "Yes":
@@ -89,6 +62,59 @@ if location_change == "Yes":
     location_change_flag = 1
 else:
     location_change_flag = 0
+
+
+
+# if customer_id in df['customer_id'].unique():
+    
+# Avrage Amount Last 24h
+avg_amount_last_24h = df.loc[df['customer_id'] == customer_id, 'avg_amount_last_24h'].max()
+
+
+# Merchant Historical Fraud Rate
+merchant_historical_fraud_rate = df.loc[df['customer_id'] == customer_id, 'merchant_historical_fraud_rate'].mean()
+
+
+# Customer Transaction Count
+cust_txn_count = int(df.loc[df['customer_id'] == customer_id, 'customer_id'].count())
+
+# Customer Fraud Count
+cust_fraud_count = df.loc[df['customer_id'] == customer_id, 'is_fraud'].sum()
+
+# Customer Fraud rate
+cust_fraud_rate = df.loc[df['customer_id'] == customer_id, 'is_fraud'].mean()
+if pd.notna(cust_fraud_rate):
+    cust_fraud_rate = int(cust_fraud_rate)
+else:
+    cust_fraud_rate = 0
+
+# Customer Average Amount
+cust_avg_amt = df.loc[df['customer_id'] == customer_id, 'amount'].mean()
+
+
+# Device Count
+device_count = df.loc[df['customer_id'] == customer_id, 'device_count'].max()
+if pd.notna(device_count):
+    device_count = int(device_count)
+else:
+    device_count = 0
+
+# Merchant Fruad Rate
+merchant_fraud_rate = df.loc[df['customer_id'] == customer_id, 'merchant_fraud_rate'].mean()
+
+
+# Combined Risk
+combined_risk = df.loc[df['customer_id'] == customer_id, 'combined_risk'].mean()
+
+
+
+
+# Day and Months
+day = int(df['transaction_date'].dt.day.mean())
+month = int(df['transaction_date'].dt.month.mean())
+
+
+
 
 
 
@@ -128,7 +154,7 @@ else:
 #          'payment_method:  ',payment_method,
 #          'merchant_cat :  ',merchant_category,
 #          'authent_method :  ',authentication_method,
-#          'transaction_amt :  ',transaction_amt, 
+#          'transaction_amt :  ',amount, 
 #          'ip_ad_score :  ',ip_address_risk_score, 
 #          'device_trust_score :  ',device_trust_score, 
 #          'device_flag :  ',device_change_flag,
@@ -137,43 +163,58 @@ else:
 #          'cust_avg_amt :  ',cust_avg_amt, 
 #          'cust_fraud_rate :  ', cust_fraud_rate, 
 #          'cust_farud_count :  ',cust_fraud_count,
-#          'cust_txn_count :  ',cust_txn_count)
+#          'cust_txn_count :  ',cust_txn_count,
+#          'avg_amount_last_24h :  ',avg_amount_last_24h,
+#          'merchant_fraud_rate :  ',merchant_fraud_rate,
+#          'merchant_historical_fraud_rate :  ',merchant_historical_fraud_rate,
+#          'combined_risk :  ', combined_risk,
+#          'day :  ', day,
+#          'month :  ', month)
 
-# if st.button("Run Risk Assessment"):
-#     # 1. Feature Engineering (Derived on the fly)
-#     amt_ratio = amount / (cust_avg_amt + 1)
-#     otp_risk = 1 - otp_success_rate
+if st.button("Run Risk Assessment"):
+
+    # 2. Prepare Feature Vector (Must match training column order)
+    input_data = pd.DataFrame({
+        'customer_id' : [customer_id],
+        'payment_method' : [payment_method],
+        'merchant_category' : [merchant_category],
+        'authentication_method' : [authentication_method],
+        'amount': [amount],
+        'ip_address_risk_score': [ip_address_risk_score],
+        'device_trust_score': [device_trust_score],
+        'avg_amount_last_24h': [avg_amount_last_24h],
+        'device_change_flag': [device_change_flag],
+        'location_change_flag': [location_change_flag],
+        'merchant_historical_fraud_rate': [merchant_historical_fraud_rate],
+        'cust_txn_count': [cust_txn_count],
+        'cust_fraud_count': [cust_fraud_count],
+        'cust_fraud_rate': [cust_fraud_rate],
+        'cust_avg_amt': [cust_avg_amt],
+        'device_count': [device_count],
+        'merchant_fraud_rate': [merchant_fraud_rate],
+        'combined_risk': [combined_risk],
+        'month': [month],
+        'day': [day],
+        # Add all other features your model was trained on...
+    })
+
+    # 3. Prediction
+    prediction = pipeline.predict(input_data)[0]
+    probability = pipeline.predict_proba(input_data)[0][1]
+
+    # 4. Results Display
+    st.subheader("Risk Analysis Result")
         
-#     # 2. Prepare Feature Vector (Must match training column order)
-#     input_data = pd.DataFrame({
-#         'amount': [amount],
-#         'ip_address_risk_score': [ip_risk],
-#         'device_trust_score': [device_trust],
-#         'is_international': [1 if is_international else 0],
-#         'amt_ratio': [amt_ratio],
-#         'otp_risk': [otp_risk],
-#         'past_fraud_count_customer': [past_fraud_count],
-#         'new_device_flag': [1 if new_device else 0]
-#         # Add all other features your model was trained on...
-#     })
+    if probability > 0.7:
+        st.error(f"⚠️ HIGH RISK: Fraud Probability {probability:.2%}")
+        st.write("**Recommended Action:** Hard Block & Device Lock")
+    elif probability > 0.4:
+        st.warning(f"🟡 MEDIUM RISK: Fraud Probability {probability:.2%}")
+        st.write("**Recommended Action:** Trigger Mandatory OTP / Manual Review")
+    else:
+        st.success(f"✅ LOW RISK: Fraud Probability {probability:.2%}")
+        st.write("**Recommended Action:** Approve Transaction")
 
-#     # 3. Prediction
-#     prediction = model.predict(input_data)[0]
-#     probability = model.predict_proba(input_data)[0][1]
-
-#     # 4. Results Display
-#     st.subheader("Risk Analysis Result")
-        
-#     if probability > 0.7:
-#         st.error(f"⚠️ HIGH RISK: Fraud Probability {probability:.2%}")
-#         st.write("**Recommended Action:** Hard Block & Device Lock")
-#     elif probability > 0.4:
-#         st.warning(f"🟡 MEDIUM RISK: Fraud Probability {probability:.2%}")
-#         st.write("**Recommended Action:** Trigger Mandatory OTP / Manual Review")
-#     else:
-#         st.success(f"✅ LOW RISK: Fraud Probability {probability:.2%}")
-#         st.write("**Recommended Action:** Approve Transaction")
-
-#     # Visualization of Feature Importance or Risk
-#     st.progress(probability)
+    # Visualization of Feature Importance or Risk
+    st.progress(probability)
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
