@@ -7,15 +7,15 @@ st.set_page_config(page_title="Predict")
 
 original_df = pd.read_csv(r'C:\Users\mabin\Desktop\DataScienceClassNotes\Career247_Capstone_Project\Fraud_Detection_Project\data\raw\transactions_fraud.csv')
 
-df = pickle.load(open('models/df.pkl', 'rb'))
+df = pickle.load(open(r'C:\Users\mabin\Desktop\DataScienceClassNotes\Career247_Capstone_Project\Fraud_Detection_Project\models\df.pkl', 'rb'))
 
-pipeline = pickle.load(open('models/pipeline.pkl', 'rb'))
+pipeline = pickle.load(open(r'C:\Users\mabin\Desktop\DataScienceClassNotes\Career247_Capstone_Project\Fraud_Detection_Project\models\pipeline.pkl', 'rb'))
 
 st.dataframe(df)
 
 st.header("Enter Your Inputs")
 
-# -----------------------------------------------------------------------------------------------------------------------------
+# # -----------------------------------------------------------------------------------------------------------------------------
 
 # Customer ID
 customer_id = st.number_input(
@@ -41,7 +41,7 @@ authentication_method = st.selectbox('Authentication Method', df['authentication
 
 
 # Transaction Amount
-transaction_amt = st.number_input("Transaction Amount", min_value=0.0)
+amount = st.number_input("Transaction Amount", min_value=0.0)
 
 
 # IP Risk Score
@@ -102,46 +102,25 @@ else:
 # avg_amount_last_24h = df.loc[df['customer_id'] == customer_id, 'avg_amount_last_24h'].mean()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Transaction Date
 # transaction_date = st.date_input("Transaction Date", )
 
 
-if st.button("Predict"):
+# if st.button("Predict"):
     
-    data = [['UPI',	'Electronics',	'OTP',	16807.26,	0.752472,	0.729953,	10895.68,	0,	0,	0.139440,	10,	1,	0.166667,	10000.218000,	10,	0.042169,	0.096758,	2,	12]]
+#     data = [['UPI',	'Electronics',	'OTP',	16807.26,	0.752472,	0.729953,	10895.68,	0,	0,	0.139440,	10,	1,	0.166667,	10000.218000,	10,	0.042169,	0.096758,	2,	12]]
 
-    columns = ['payment_method',	'merchant_category',	'authentication_method',	'amount',	'ip_address_risk_score',	'device_trust_score',	
-               'avg_amount_last_24h',	'device_change_flag',	'location_change_flag',	'merchant_historical_fraud_rate',	'cust_txn_count',	
-               'cust_fraud_count',	'cust_fraud_rate',	'cust_avg_amt',	'device_count',	'merchant_fraud_rate',	'combined_risk',	'month',	'day']
+#     columns = ['payment_method',	'merchant_category',	'authentication_method',	'amount',	'ip_address_risk_score',	'device_trust_score',	
+#                'avg_amount_last_24h',	'device_change_flag',	'location_change_flag',	'merchant_historical_fraud_rate',	'cust_txn_count',	
+#                'cust_fraud_count',	'cust_fraud_rate',	'cust_avg_amt',	'device_count',	'merchant_fraud_rate',	'combined_risk',	'month',	'day']
 
 
 
-    one_df = pd.DataFrame(data, columns=columns)
+#     one_df = pd.DataFrame(data, columns=columns)
     
-    base_predict = pipeline.predict(one_df)[0]
+#     base_predict = pipeline.predict(one_df)[0]
     
-    st.success(base_predict)
+#     st.success(base_predict)
 
 
 
@@ -159,3 +138,42 @@ if st.button("Predict"):
 #          'cust_fraud_rate :  ', cust_fraud_rate, 
 #          'cust_farud_count :  ',cust_fraud_count,
 #          'cust_txn_count :  ',cust_txn_count)
+
+# if st.button("Run Risk Assessment"):
+#     # 1. Feature Engineering (Derived on the fly)
+#     amt_ratio = amount / (cust_avg_amt + 1)
+#     otp_risk = 1 - otp_success_rate
+        
+#     # 2. Prepare Feature Vector (Must match training column order)
+#     input_data = pd.DataFrame({
+#         'amount': [amount],
+#         'ip_address_risk_score': [ip_risk],
+#         'device_trust_score': [device_trust],
+#         'is_international': [1 if is_international else 0],
+#         'amt_ratio': [amt_ratio],
+#         'otp_risk': [otp_risk],
+#         'past_fraud_count_customer': [past_fraud_count],
+#         'new_device_flag': [1 if new_device else 0]
+#         # Add all other features your model was trained on...
+#     })
+
+#     # 3. Prediction
+#     prediction = model.predict(input_data)[0]
+#     probability = model.predict_proba(input_data)[0][1]
+
+#     # 4. Results Display
+#     st.subheader("Risk Analysis Result")
+        
+#     if probability > 0.7:
+#         st.error(f"⚠️ HIGH RISK: Fraud Probability {probability:.2%}")
+#         st.write("**Recommended Action:** Hard Block & Device Lock")
+#     elif probability > 0.4:
+#         st.warning(f"🟡 MEDIUM RISK: Fraud Probability {probability:.2%}")
+#         st.write("**Recommended Action:** Trigger Mandatory OTP / Manual Review")
+#     else:
+#         st.success(f"✅ LOW RISK: Fraud Probability {probability:.2%}")
+#         st.write("**Recommended Action:** Approve Transaction")
+
+#     # Visualization of Feature Importance or Risk
+#     st.progress(probability)
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
