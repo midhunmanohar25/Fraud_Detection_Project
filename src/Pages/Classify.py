@@ -110,8 +110,10 @@ combined_risk = df.loc[df['customer_id'] == customer_id, 'combined_risk'].mean()
 
 
 # Day and Months
-day = int(df['transaction_date'].dt.day.mean())
-month = int(df['transaction_date'].dt.month.mean())
+import datetime
+transaction_date = st.date_input("Transaction Date", datetime.date.today())
+month = transaction_date.month
+day = transaction_date.day
 
 
 
