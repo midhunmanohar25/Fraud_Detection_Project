@@ -1,7 +1,7 @@
 Career247_Capstone_Project_Pipeline
 ==============================
 
-Built a machine learning–based fraud detection system to identify suspicious transactions and reduce financial risk.
+Designed and implemented an end-to-end machine learning–based fraud detection system to analyze financial transaction data and identify suspicious activities. The project includes data preprocessing, exploratory data analysis, feature engineering, model training, and a risk analysis interface to help detect fraudulent transactions and reduce financial risk.
 
 Project Organization
 ------------
@@ -10,12 +10,9 @@ Project Organization
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
     │   ├── processed      <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
     │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -25,29 +22,27 @@ Project Organization
     │
     ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
     │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
     │
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
     │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
+    ├── Website                <- Website used for this project
     │   │
     │   ├── data           <- Scripts to download or generate data
     │   │   └── make_dataset.py
     │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
+    |   ├── Pages           <- Pages of the website used in this project    
+    │   │   |
+    |   |   ├── 1_Fraud Risk Engine.py
+    |   |   ├── 2_Risk Analysis Section.py
+    |   |   └── 3_Recommendations.py
+    |   |
+    |   |
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
+    │   │   ├── df.pkl
+    │   │   └── pipeline.pkl
     │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
